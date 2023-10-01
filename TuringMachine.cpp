@@ -24,16 +24,16 @@ void TuringMachine::add_element(char element) {
 		head = cell;
 		return;
 	}
-	Cell* ñurrent= head; 
-	while (ñurrent->next) {
-		ñurrent = ñurrent->next;
+	Cell* current= head; 
+	while (current->next) {
+		current = current->next;
 	}
 	Cell* cell = new Cell;
 	cell->info = element;
 	cell->next = NULL;
-	cell->prev = ñurrent;
-	ñurrent->next = cell;
-	ñurrent = cell;
+	cell->prev = current;
+	current->next = cell;
+	current = cell;
 }
 
 void TuringMachine::clear_tape() {
