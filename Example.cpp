@@ -4,18 +4,33 @@
 using namespace std;
 
 int main() {
-	TuringMachine t;
-	t.add_element('1');
-	t.add_element('#');
-	t.add_element('$');
-	t.add_element('1');
-	t.add_element('0');
-	t.add_element('#');
-	t.show_tape();
-	int n = 4;
-	t.create_rules(n);
-	t.show_rules(n);
-	t.run_machine(n);
-	t.show_tape();
-	t.clear_tape();
+	TuringMachine machine;
+	machine.add_element('1');
+	machine.add_element('#');
+	machine.add_element('$');
+	machine.add_element('1');
+	machine.add_element('0');
+	machine.add_element('#');
+	machine.show_tape();
+	int size = 4;
+	char found, required, turn;
+	int nextrule;
+	cout << "found\trequired\tturn\tnextrule" << endl;
+	for (int i = 0; i < size; i++) {
+		if (i != size - 1) {
+			cin >> found >> required >> turn >> nextrule;
+			machine.create_rules(found, required, turn, nextrule);
+		}
+		else {
+			cin >> found >> required >> turn;
+			nextrule = 1;
+			machine.create_rules(found, required, turn, nextrule);
+		}
+	}
+	cout << "rules:" << endl;
+	machine.show_rules(size);
+	machine.run_machine(size);
+	machine.show_tape();
+	machine.clear_tape();
+	
 }

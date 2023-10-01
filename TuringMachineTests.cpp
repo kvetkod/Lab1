@@ -13,9 +13,9 @@ namespace UnitTestNamespace
 		TEST_METHOD(ShowRulesTest1)
 		{
 			TuringMachine machine;
-			Rule r;
-			r.turn = 'r';
-			machine.rules.push_back(r);
+			char found, required, turn; int nextrule = 1;
+			found = '1'; required = '1'; turn = 'r';
+			machine.create_rules(found, required, turn, nextrule);
 			stringstream buf;
 			streambuf* oldbuf = cout.rdbuf(buf.rdbuf());
 
@@ -24,7 +24,7 @@ namespace UnitTestNamespace
 
 			string output = buf.str();
 			char a = output[0];
-			Assert::AreEqual(a, 'r');
+			Assert::AreEqual(a, '1');
 		}
 		TEST_METHOD(ShowTapeTest1)
 		{
@@ -42,33 +42,47 @@ namespace UnitTestNamespace
 		{
 			TuringMachine machine;
 			machine.add_element('1');
-			Assert::IsNotNull(machine.head);
+			stringstream buf;
+			streambuf* oldbuf = cout.rdbuf(buf.rdbuf());
+
+			machine.show_tape();
+			cout.rdbuf(oldbuf);
+
+			string output = buf.str();
+			char a = output[0];
+			Assert::AreEqual(a, '1');
 		}
 		TEST_METHOD(AddElementTest2)
 		{
 			TuringMachine machine;
 			machine.add_element('1');
-			Assert::AreEqual(machine.head->info, '1');
+			machine.add_element('2');
+			stringstream buf;
+			streambuf* oldbuf = cout.rdbuf(buf.rdbuf());
+
+			machine.show_tape();
+			cout.rdbuf(oldbuf);
+
+			string output = buf.str();
+			char a = output[0];
+			Assert::AreEqual(a, '1');
 		}
-		TEST_METHOD(AddElementTest3)
-		{
-			TuringMachine machine;
-			machine.add_element('1');
-			machine.add_element('1');
-			machine.add_element('1');
-			Cell* iterator = machine.head;
-			while (iterator->next != NULL) {
-				iterator = iterator->next;
-			}
-			Assert::IsNotNull(iterator);
-		}
+		
 		TEST_METHOD(AddElementTest4)
 		{
 			TuringMachine machine;
 			machine.add_element('1');
 			machine.add_element('2');
 			machine.add_element('3');
-			Assert::AreEqual(machine.head->next->next->info, '3');
+			stringstream buf;
+			streambuf* oldbuf = cout.rdbuf(buf.rdbuf());
+
+			machine.show_tape();
+			cout.rdbuf(oldbuf);
+
+			string output = buf.str();
+			char a = output[2];
+			Assert::AreEqual(a, '3');
 		}
 
 		TEST_METHOD(ClearTapeTest1)
@@ -76,77 +90,113 @@ namespace UnitTestNamespace
 			TuringMachine machine;
 			machine.add_element('1');
 			machine.clear_tape();
-			Assert::IsNull(machine.head);
+			stringstream buf;
+			streambuf* oldbuf = cout.rdbuf(buf.rdbuf());
+
+			machine.show_tape();
+			cout.rdbuf(oldbuf);
+
+			string output = buf.str();
+			char a = output[0];
+			Assert::AreNotEqual(a, '1');
 		}
 		TEST_METHOD(ClearTapeTest2)
 		{
 			TuringMachine machine;
 			machine.add_element('1');
 			machine.add_element('2');
-			machine.clear_tape();
-			Assert::IsNull(machine.head);
+			machine.clear_tape(); 
+			stringstream buf;
+			streambuf* oldbuf = cout.rdbuf(buf.rdbuf());
+
+			machine.show_tape();
+			cout.rdbuf(oldbuf);
+
+			string output = buf.str();
+			char a = output[0];
+			Assert::AreNotEqual(a, '1');
 		}
 		TEST_METHOD(ClearTapeTest3)
 		{
 			TuringMachine m1, m2;
 			m1.add_element('1');
-			m2.add_element('1');
+			m2.add_element('2');
 			m1.clear_tape();
-			Assert::IsNotNull(m2.head);
+			stringstream buf;
+			streambuf* oldbuf = cout.rdbuf(buf.rdbuf());
+
+			m2.show_tape();
+			cout.rdbuf(oldbuf);
+
+			string output = buf.str();
+			char a = output[0];
+			Assert::AreEqual(a, '2');
 		}
-		TEST_METHOD(ClearTapeTest4)
-		{
-			TuringMachine m1, m2;
-			m1.add_element('1');
-			m2.add_element('1');
-			m1.clear_tape();
-			Assert::AreEqual(m2.head->info, '1');
-		}
+	
 
 		TEST_METHOD(CreateRulesTest1)
 		{
 			TuringMachine machine;
 			int size = 1;
-			stringstream input;
-			input << "1 1 L 1" << endl;
-			vector<Rule> Input = { { '1','1','L',1 } };
-			istringstream redirect(input.str());
-			streambuf* oldCinBuf = cin.rdbuf(redirect.rdbuf());
-			machine.create_rules(size);
-			cin.rdbuf(oldCinBuf);
-			Assert::AreEqual(machine.rules[0].found, '1');
+			char found, required, turn; int nextrule;
+			found = '1'; required = '0'; nextrule = 1; turn = 'r';
+			machine.create_rules(found, required, turn, nextrule);
+			stringstream buf;
+			streambuf* oldbuf = cout.rdbuf(buf.rdbuf());
+
+			machine.show_rules(size);
+			cout.rdbuf(oldbuf);
+
+			string output = buf.str();
+			char a = output[0];
+			Assert::AreEqual(a, '1');
 		}
 
 		TEST_METHOD(RunMachineTest1)
 		{
 			TuringMachine machine;
 			machine.add_element('1');
-			Rule r;
-			r.found = '1'; r.required = '0'; r.nextrule = 1; r.turn = 'r';
-			machine.rules.push_back(r);
+			char found, required, turn; int nextrule;
+			found = '1'; required = '0'; nextrule = 1; turn = 'r';
+			machine.create_rules(found, required, turn, nextrule);
 			machine.run_machine(1);
-			Assert::AreEqual(machine.head->info, '0');
+			stringstream buf;
+			streambuf* oldbuf = cout.rdbuf(buf.rdbuf());
+
+			machine.show_tape();
+			cout.rdbuf(oldbuf);
+
+			string output = buf.str();
+			char a = output[0];
+			Assert::AreEqual(a, '0');
 		}
-		TEST_METHOD(RunMachineTest2)
-		{
-			TuringMachine machine;
-			machine.add_element('1');
-			Rule r;
-			r.found = '1'; r.required = '0'; r.nextrule = 1; r.turn = 'r';
-			machine.rules.push_back(r);
-			machine.run_machine(1);
-			Assert::IsNotNull(machine.head);
-		}
+	
 		TEST_METHOD(RunMachineTest3)
 		{
 			TuringMachine m1, m2;
 			m1.add_element('1');
 			m2.add_element('1');
-			Rule r;
-			r.found = '1'; r.required = '0'; r.nextrule = 1; r.turn = 'r';
-			m1.rules.push_back(r);
+			stringstream buf2;
+			streambuf* oldbuf2 = cout.rdbuf(buf2.rdbuf());
+
+			m1.show_tape();
+			cout.rdbuf(oldbuf2);
+
+			string output2 = buf2.str();
+			char b = output2[0];
+			char found, required, turn; int nextrule;
+			found = '1'; required = '0'; nextrule = 1; turn = 'r';
+			m1.create_rules(found, required, turn, nextrule);
 			m1.run_machine(1);
-			Assert::AreNotEqual(m1.head->info, m2.head->info);
+			stringstream buf1;
+			streambuf* oldbuf1 = cout.rdbuf(buf1.rdbuf());
+
+			m1.show_tape();
+			cout.rdbuf(oldbuf1);
+			
+			string output1 = buf1.str();
+			char a = output1[0];
+			Assert::AreNotEqual(a, b);
 		}
 	};
 }

@@ -2,25 +2,38 @@
 #include<iostream>
 using namespace std;
 
-void TuringMachine::add_element(char n) {
+Rule::Rule(char found_, char required_, char turn_, int nextrule_) {
+	found = found_;
+	required = required_;
+	turn = turn_;
+	nextrule = nextrule_;
+}
+
+void Rule::print() {
+
+	cout << found << "\t" << required << "\t" << turn << "\t" << nextrule << endl;
+
+}
+
+void TuringMachine::add_element(char element) {
 	if (head == NULL) {
-		Cell* buf = new Cell;
-		buf->info = n;
-		buf->next = NULL;
-		buf->prev = NULL;
-		head = buf;
+		Cell* cell = new Cell;
+		cell->info = element;
+		cell->next = NULL;
+		cell->prev = NULL;
+		head = cell;
 		return;
 	}
-	Cell* it = head;
-	while (it->next) {
-		it = it->next;
+	Cell* ñurrent= head; 
+	while (ñurrent->next) {
+		ñurrent = ñurrent->next;
 	}
-	Cell* buf = new Cell;
-	buf->info = n;
-	buf->next = NULL;
-	buf->prev = it;
-	it->next = buf;
-	it = buf;
+	Cell* cell = new Cell;
+	cell->info = element;
+	cell->next = NULL;
+	cell->prev = ñurrent;
+	ñurrent->next = cell;
+	ñurrent = cell;
 }
 
 void TuringMachine::clear_tape() {
@@ -34,80 +47,78 @@ void TuringMachine::clear_tape() {
 
 void TuringMachine::show_tape() {
 	
-	Cell* buf = head;
-	while (buf) {
-		cout << buf->info;
-		buf = buf->next;
+	Cell* cell = head;
+	while (cell) {
+		cout << cell->info;
+		cell = cell->next;
 	}
 	cout << endl;
 }
 
-void TuringMachine::create_rules(int n) {
-	Rule r;
-	cout << "found\trequired\tturn\tnextrule" << endl;
-	for (int i = 0; i < n-1; i++) {
-		
-		cin >> r.found >> r.required >> r.turn >> r.nextrule ;
-		rules.push_back(r);
-	}
-	Rule p;
-	cin >> p.found >> p.required >> p.turn;
-	p.nextrule = - 1;
-	rules.push_back(p);
+void TuringMachine::create_rules(char found_, char required_, char turn_, int nextrule_) {
+
+	Rule r(found_, required_, turn_, nextrule_);
+	rules.push_back(r);
+
 }
 
-void TuringMachine::show_rules(int n) {
-	cout << "rules:" << endl;
-	for (int i = 0; i < n; i++) {
-		cout << rules[i].found << "\t" << rules[i].required << "\t" << rules[i].turn <<"\t"<<rules[i].nextrule;
+void TuringMachine::show_rules(int size) {
+	for (int i = 0; i < size; i++) {
+		rules[i].print();
 	}
 	cout << endl;
 }
 
 
-void TuringMachine::run_machine(int n) {
+void TuringMachine::run_machine(int size) {
 	Cell* iterator=head;
-	bool longcycle = false;
+	bool long_cycle = false;
 	int i=0;
-	while (i != -1 && i < n) {
+	while (i != -1 && i < size) {
 		if (rules[i].found == iterator->info) {
-			longcycle = false;
-			iterator->info = rules[i].required;
-			if (rules[i].turn == 'r' && iterator->next != NULL) {
-				iterator = iterator->next;
-				//TuringMachine::turn(iterator, 'r');
+			long_cycle = false;
+			if (find_element(rules[i].required, rules[i].turn, iterator))
 				continue;
-			}
-			if (rules[i].turn == 'l' && iterator->prev != NULL) {
-				iterator = iterator->prev;
-				//TuringMachine::turn(iterator, 'l');
-				continue;
-			}
-			if (iterator->next == NULL || iterator->prev == NULL) {
-				return;
-			}
+			else return;
 			i = rules[i].nextrule - 1;
 		}
 		else {
-			if (i == n - 1) {
-				if (!longcycle) {
-					i = 0;
-					longcycle = true;
-				}
-				else {
-					if (iterator->next != NULL) {
-						iterator = iterator->next;
-						//TuringMachine::turn(iterator, 'r');
-					}
-					else return;
-				}
-			}
-			else {
-				i++;
-			}
+			move(i, size, iterator, long_cycle);
 		}
 	}
 }
 
 
+bool TuringMachine::find_element(char required, char turn, Cell* &iterator) {
+	iterator->info = required;
+	if (turn == 'r' && iterator->next != NULL) {
+		iterator = iterator->next;
+		return true;
+	}
+	if (turn == 'l' && iterator->prev != NULL) {
+		iterator = iterator->prev;
+		return true;
+	}
+	if (iterator->next == NULL || iterator->prev == NULL) {
+		return false;
+	}
+}
+
+void TuringMachine::move(int &i, int size, Cell* &iterator, bool &long_cycle) {
+	if (i == size - 1) {
+		if (!long_cycle) {
+			i = 0;
+			long_cycle = true;
+		}
+		else {
+			if (iterator->next != NULL) {
+				iterator = iterator->next;
+			}
+			else return;
+		}
+	}
+	else {
+		i++;
+	}
+}
 
