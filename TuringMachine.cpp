@@ -8,6 +8,45 @@ Rule::Rule(char found_, char required_, char turn_, int nextrule_) {
 	turn = turn_;
 	nextrule = nextrule_;
 }
+char Rule::found_() {
+	return found;
+}
+char Rule::required_() {
+	return required;
+}
+char Rule::turn_() {
+	return turn;
+}
+int Rule::nextrule_() {
+	return nextrule;
+}
+
+
+
+void Cell::info_(char element) {
+	info = element;
+}
+
+char Cell::info_() {
+	return info;
+}
+
+void Cell::next_(Cell* cell) {
+	next = cell;
+}
+
+void Cell::prev_(Cell* current) {
+	prev = current;
+}
+
+Cell* Cell::prev_() {
+	return prev;
+}
+
+Cell* Cell::next_() {
+	
+	return next;
+}
 
 void Rule::print() {
 
@@ -18,28 +57,26 @@ void Rule::print() {
 void TuringMachine::add_element(char element) {
 	if (head == NULL) {
 		Cell* cell = new Cell;
-		cell->info = element;
-		cell->next = NULL;
-		cell->prev = NULL;
+		cell->info_(element);
+		cell->prev_(NULL);
 		head = cell;
 		return;
 	}
-	Cell* current= head; 
-	while (current->next) {
-		current = current->next;
+	Cell* current = head; 
+	while (current->next_()) {
+		current = current->next_();
 	}
 	Cell* cell = new Cell;
-	cell->info = element;
-	cell->next = NULL;
-	cell->prev = current;
-	current->next = cell;
+	cell->info_(element);
+	cell->prev_(current);
+	current->next_(cell);
 	current = cell;
 }
 
 void TuringMachine::clear_tape() {
 	if (head == NULL) return;
 	while (head) {
-		Cell* next = head->next;
+		Cell* next = head->next_();
 		delete head;
 		head = next;
 	}
@@ -49,8 +86,8 @@ void TuringMachine::show_tape() {
 	
 	Cell* cell = head;
 	while (cell) {
-		cout << cell->info;
-		cell = cell->next;
+		cout << cell->info_();
+		cell = cell->next_();
 	}
 	cout << endl;
 }
@@ -75,12 +112,12 @@ void TuringMachine::run_machine(int size) {
 	bool long_cycle = false;
 	int i=0;
 	while (i != -1 && i < size) {
-		if (rules[i].found == iterator->info) {
+		if (rules[i].found_() == iterator->info_()) {
 			long_cycle = false;
-			if (find_element(rules[i].required, rules[i].turn, iterator))
+			if (find_element(rules[i].required_(), rules[i].turn_(), iterator))
 				continue;
 			else return;
-			i = rules[i].nextrule - 1;
+			i = rules[i].nextrule_() - 1;
 		}
 		else {
 			move(i, size, iterator, long_cycle);
@@ -90,16 +127,16 @@ void TuringMachine::run_machine(int size) {
 
 
 bool TuringMachine::find_element(char required, char turn, Cell* &iterator) {
-	iterator->info = required;
-	if (turn == 'r' && iterator->next != NULL) {
-		iterator = iterator->next;
+	iterator->info_(required);
+	if (turn == 'r' && iterator->next_() != NULL) {
+		iterator = iterator->next_();
 		return true;
 	}
-	if (turn == 'l' && iterator->prev != NULL) {
-		iterator = iterator->prev;
+	if (turn == 'l' && iterator->prev_() != NULL) {
+		iterator = iterator->prev_();
 		return true;
 	}
-	if (iterator->next == NULL || iterator->prev == NULL) {
+	if (iterator->next_() == NULL || iterator->prev_() == NULL) {
 		return false;
 	}
 }
@@ -111,8 +148,8 @@ void TuringMachine::move(int &i, int size, Cell* &iterator, bool &long_cycle) {
 			long_cycle = true;
 		}
 		else {
-			if (iterator->next != NULL) {
-				iterator = iterator->next;
+			if (iterator->next_() != NULL) {
+				iterator = iterator->next_();
 			}
 			else return;
 		}
